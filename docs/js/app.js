@@ -707,21 +707,14 @@ fetchCSV(TEXTS_URL)
     // ── Prefix → field mapping for column-targeted search ──
     const PREFIX_MAP = {
       "id":   "TextID_D",
-      "d":    "Date_D",
+      "date": "Date_D",
       "r":    "Ruler",
       "y":    "Year",
       "m":    "Month",
-      "day":  "Day",
+      "d":    "Day",
       "dos":  "Dossier_D",
-      "arc":  "Archive_D",
-      "gen":  "Genre_D",
-      "loc":  "Locus_D",
-      "str":  "Stratum_D",
-      "exc":  "ExcNum_C",
-      "mus":  "Mus_C",
-      "acc":  "MusAcc_C",
-      "cdli": "TextID_C",
-      "arch": "TextNum_A"
+      "arch": "Archive_D",
+      "gen":  "Genre_D"
     };
 
     // ── City toggle ────────────────────────────────────────
