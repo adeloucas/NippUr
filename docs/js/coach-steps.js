@@ -1,5 +1,5 @@
 // ── Coach Mark Step Definitions ───────────────────────────
-// Edit this file to update tour content without touching any logic.
+// Edit this file to update user guide content.
 
 const COACH_STEPS = [
   {
@@ -17,14 +17,14 @@ const COACH_STEPS = [
              <thead><tr><th>Prefix</th><th>Column</th><th>Example</th></tr></thead>
              <tbody>
                <tr><td><code>id:</code></td><td>Deloucas ID</td><td><code>id:567</code></td></tr>
-               <tr><td><code>date:</code></td><td>Date</td><td><code>d:2016</code></td></tr>
+               <tr><td><code>date:</code></td><td>Date</td><td><code>date:2016</code></td></tr>
                <tr><td><code>r:</code></td><td>Ruler</td><td><code>r:Sumu-el</code></td></tr>
                <tr><td><code>y:</code></td><td>Year</td><td><code>y:7</code></td></tr>
                <tr><td><code>m:</code></td><td>Month</td><td><code>m:3</code></td></tr>
-               <tr><td><code>d:</code></td><td>Day</td><td><code>day:15</code></td></tr>
+               <tr><td><code>d:</code></td><td>Day</td><td><code>d:15</code></td></tr>
                <tr><td><code>gen:</code></td><td>Genre</td><td><code>gen:legal</code></td></tr>
                <tr><td><code>dos:</code></td><td>Dossier</td><td><code>dos:E-Enlil</code></td></tr>
-               <tr><td><code>arch:</code></td><td>Archive</td><td><code>arc:Giparu</code></td></tr>
+               <tr><td><code>arch:</code></td><td>Archive</td><td><code>arch:Giparu</code></td></tr>
              </tbody>
            </table>`
   },
