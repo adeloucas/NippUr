@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deloucas Dissertation Database</title>
+  <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <div class="page-title-row">
+    <h2>Deloucas Dissertation Database</h2>
+  </div>
+
+  <!-- Toolbar: Clear all / City toggle / User Guide -->
+  <div class="text-toolbar">
+    <button id="clear-all-btn"><span>&#x2715;</span><span>Clear all searches</span></button>
+
+    <div class="city-toggle" id="city-toggle">
+      <button class="city-btn" data-city="nippur">Nippur</button>
+      <span class="city-sep">|</span>
+      <button class="city-btn city-btn-active" data-city="all">All</button>
+      <span class="city-sep">|</span>
+      <button class="city-btn" data-city="ur">Ur</button>
+    </div>
+
+    <button id="user-guide-tips-btn">&#9432; User Guide &amp; Search Tips</button>
+  </div>
+
+  <!-- Text search + clear -->
+  <div class="bottom-controls" id="bottom-controls">
+    <input id="search-input" type="text" placeholder="Search across all fields or use prefix to narrow search (see User Guide &amp; Search Tips)">
+    <button id="clear-search">Clear</button>
+  </div>
+
+  <!-- Main texts table -->
+  <div class="main-table-container">
+    <div class="main-table-header" id="main-table-header">
+      <span id="main-table-label">All Texts</span><span id="main-table-count"></span>
+    </div>
+    <div id="main-table"></div>
+  </div>
+
+  <div class="page-grid">
+
+    <!-- Row 1: Deloucas ID + Date mini boxes -->
+    <div class="id-date-row">
+      <div class="mini-box">
+        <div class="box-label">Deloucas ID</div>
+        <div id="box-textid"><span class="empty-state">—</span></div>
+      </div>
+      <div class="mini-box">
+        <div class="box-label">Date (Ruler Year, Month/Day)</div>
+        <div id="box-date"><span class="empty-state">—</span></div>
+      </div>
+    </div>
+
+    <!-- Row 2: External database info -->
+    <div class="detail-box" id="box-links">
+      <div class="detail-title">External Database Information</div>
+      <div id="detail-links"><span class="empty-state">Click a row to view details</span></div>
+    </div>
+
+    <!-- Row 3: Genre / Dossier / Archive -->
+    <div class="detail-box" id="box-class">
+      <div class="detail-title">Genre / Dossier / Archive</div>
+      <div id="detail-class"><span class="empty-state">Click a row to view details</span></div>
+    </div>
+
+    <!-- Right column rows 1–3: Names panel -->
+    <div class="names-panel">
+      <div class="names-panel-header">
+        <span class="header-title">Names</span>
+        <div class="names-search-wrapper">
+          <input
+            id="names-search-input"
+            type="text"
+            placeholder="Search for names…"
+            autocomplete="off"
+          >
+          <div id="names-autocomplete-list"></div>
+          <button id="names-clear-search">Clear</button>
+        </div>
+      </div>
+      <div class="names-table-body">
+        <div id="names-table"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CDN libraries first, then app logic, then coach mark system -->
+  <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js" defer></script>
+  <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/coach-steps.js" defer></script>
+  <script src="js/coach.js" defer></script>
+</body>
+</html>
