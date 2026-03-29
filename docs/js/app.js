@@ -593,13 +593,23 @@ fetchCSV(NAMES_URL)
       setSelectedRow(row, "names");
 
       if (mainTableRef && tid) {
-        mainTableRef.on("dataFiltered", function highlightOnce() {
-          mainTableRef.off("dataFiltered", highlightOnce);
-          const match = mainTableRef.getRows("active").find(
-            r => str(r.getData().TextID_D) === tid
-          );
-          if (match) setSelectedRow(match, "texts");
-        });
+        // Try to highlight immediately — works when the filter hasn't changed
+        // (e.g. clicking a different name row for the same person filter)
+        const immediate = mainTableRef.getRows("active").find(
+          r => str(r.getData().TextID_D) === tid
+        );
+        if (immediate) {
+          setSelectedRow(immediate, "texts");
+        } else {
+          // Filter is still settling — wait for dataFiltered then highlight
+          mainTableRef.on("dataFiltered", function highlightOnce() {
+            mainTableRef.off("dataFiltered", highlightOnce);
+            const match = mainTableRef.getRows("active").find(
+              r => str(r.getData().TextID_D) === tid
+            );
+            if (match) setSelectedRow(match, "texts");
+          });
+        }
       }
 
       if (tid && allTextsData.length > 0) {
