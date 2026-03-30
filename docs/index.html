@@ -14,29 +14,27 @@
     <button id="user-guide-tips-btn">&#9432; User Guide<span class="guide-btn-extra"> &amp; Search Tips</span></button>
   </div>
 
-  <!-- Toolbar: Clear all / City toggle / Chapter toggle / User Guide -->
+  <!-- Toolbar: Clear all / Merged sort toggle -->
   <div class="text-toolbar">
     <button id="clear-all-btn"><span>&#x2715;</span><span>Clear all searches</span></button>
 
-    <div class="city-toggle" id="city-toggle">
-      <button class="city-btn" data-city="nippur">Nippur</button>
-      <span class="city-sep">|</span>
-      <button class="city-btn city-btn-active" data-city="all">All</button>
-      <span class="city-sep">|</span>
-      <button class="city-btn" data-city="ur">Ur</button>
-    </div>
+    <div class="sort-toggle" id="sort-toggle">
+      <span class="sort-group-label">Sort by</span>
+      <button class="sort-btn sort-btn-active" data-filter-type="all" data-filter-value="all">All</button>
 
-    <div class="city-toggle" id="chap-toggle">
-      <span class="city-sep" style="color:rgba(255,255,255,0.55);padding:0 4px 0 2px;font-size:11px;font-weight:700;letter-spacing:0.3px;text-transform:uppercase;">Ch.</span>
-      <button class="city-btn chap-btn city-btn-active" data-chap="all">All</button>
-      <span class="city-sep">|</span>
-      <button class="city-btn chap-btn" data-chap="4">4</button>
-      <span class="city-sep">|</span>
-      <button class="city-btn chap-btn" data-chap="5">5</button>
-      <span class="city-sep">|</span>
-      <button class="city-btn chap-btn" data-chap="6">6</button>
-      <span class="city-sep">|</span>
-      <button class="city-btn chap-btn" data-chap="0">–</button>
+      <span class="sort-sep-tall">|</span>
+
+      <span class="sort-group-label">Chapter</span>
+      <button class="sort-btn" data-filter-type="chapter" data-filter-value="4">4</button>
+      <button class="sort-btn" data-filter-type="chapter" data-filter-value="5">5</button>
+      <button class="sort-btn" data-filter-type="chapter" data-filter-value="6">6</button>
+      <button class="sort-btn" data-filter-type="chapter" data-filter-value="0">–</button>
+
+      <span class="sort-sep-tall">|</span>
+
+      <span class="sort-group-label">City</span>
+      <button class="sort-btn" data-filter-type="city" data-filter-value="nippur">Nippur</button>
+      <button class="sort-btn" data-filter-type="city" data-filter-value="ur">Ur</button>
     </div>
   </div>
 
