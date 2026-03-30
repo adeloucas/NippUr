@@ -24,7 +24,6 @@ h2 { margin: 0; color: white; }
   margin-bottom: 14px;
 }
 
-/* Push the button to the far right of the title row */
 .page-title-row #user-guide-tips-btn {
   margin-left: auto;
   flex-shrink: 0;
@@ -58,21 +57,43 @@ h2 { margin: 0; color: white; }
   flex-wrap: nowrap;
 }
 
-/* ─── CITY TOGGLE ─── */
-.city-toggle {
+/* ─── MERGED SORT TOGGLE ─── */
+.sort-toggle {
   display: inline-flex;
   align-items: center;
   height: 28px;
   background: #5a6478;
   border: 1px solid rgba(255,255,255,0.2);
   border-radius: 20px;
-  padding: 0 6px;
+  padding: 0 8px;
+  gap: 2px;
 }
-.city-btn {
+
+.sort-group-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 0 4px;
+  user-select: none;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.sort-sep-tall {
+  font-size: 16px;
+  color: rgba(255,255,255,0.35);
+  padding: 0 4px;
+  user-select: none;
+  line-height: 1;
+}
+
+.sort-btn {
   display: inline-flex;
   align-items: center;
   height: 22px;
-  padding: 0 10px;
+  padding: 0 9px;
   border: none;
   border-radius: 11px;
   cursor: pointer;
@@ -84,11 +105,14 @@ h2 { margin: 0; color: white; }
   white-space: nowrap;
   line-height: 1;
 }
-.city-btn:hover { color: #fff; }
-.city-btn.city-btn-active {
+.sort-btn:hover { color: #fff; }
+.sort-btn.sort-btn-active {
   background: #c9a84c;
   color: #fff;
 }
+
+/* Keep legacy city-btn classes working (used by coach.js spotlight) */
+.city-toggle { display: none; }
 .city-sep {
   font-size: 12px;
   color: rgba(255,255,255,0.45);
@@ -544,15 +568,14 @@ a.external-link:hover { text-decoration: underline; }
 @media (max-width: 600px) {
   body { padding: 8px; }
   .page-title-row { flex-wrap: wrap; gap: 8px; }
-  .guide-btn-extra { display: none; }  /* shorten to "ⓘ User Guide" on small screens */
+  .guide-btn-extra { display: none; }
   .id-date-row { grid-template-columns: 1fr 1fr; }
   .bottom-controls { flex-direction: row; flex-wrap: nowrap; }
   #search-input    { flex: 1; min-width: 0; }
   #clear-search    { flex-shrink: 0; width: auto; }
   .main-table-container { height: 260px; }
 
-  /* ── Toolbar: keep controls on one line ── */
-  .text-toolbar { gap: 6px; }
+  .text-toolbar { gap: 6px; flex-wrap: wrap; }
 
   #clear-all-btn {
     padding: 0 8px;
@@ -561,7 +584,8 @@ a.external-link:hover { text-decoration: underline; }
     flex-shrink: 0;
   }
 
-  .city-btn  { padding: 0 7px; font-size: 11px; }
+  .sort-btn      { padding: 0 6px; font-size: 11px; }
+  .sort-group-label { padding: 0 2px; font-size: 10px; }
 
   #user-guide-tips-btn {
     padding: 5px 10px;
