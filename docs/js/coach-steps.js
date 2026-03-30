@@ -3,11 +3,10 @@
 
 const COACH_STEPS = [
   {
-    targetIds: ["city-toggle", "chap-toggle"],
-    title: "Filter by Site or Chapter",
-    body: `<p>Use <strong style="color:#c9a84c">Nippur</strong>, <strong style="color:#c9a84c">All</strong>, or <strong style="color:#c9a84c">Ur</strong> to restrict every table and search to a single site. The active filter is highlighted in gold.</p>
-           <p>Changing the city filter updates the texts table, detail panels, and the names panel.</p>
-           <p>Similarly, you can toggle by <strong style="color:#c9a84c">chapter</strong> to focus on texts discussed in a specific part of the dissertation.</p>`
+    targetId: "sort-toggle",
+    title: "Filter by Chapter or City",
+    body: `<p>Sort by <strong style="color:#c9a84c">Chapter</strong>, <strong style="color:#c9a84c">City</strong>, or <strong style="color:#c9a84c">All</strong> to restrict search. The active city or chapter is highlighted in gold.</p>
+           <p><strong style="color:#c9a84c">Changing the filter updates the texts table, detail panels, and the names panel.</strong></p>`
   },
   {
     targetId: "bottom-controls",
