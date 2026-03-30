@@ -24,6 +24,12 @@ h2 { margin: 0; color: white; }
   margin-bottom: 14px;
 }
 
+/* Push the button to the far right of the title row */
+.page-title-row #user-guide-tips-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 #clear-all-btn {
   display: inline-flex;
   align-items: center;
@@ -538,13 +544,14 @@ a.external-link:hover { text-decoration: underline; }
 @media (max-width: 600px) {
   body { padding: 8px; }
   .page-title-row { flex-wrap: wrap; gap: 8px; }
+  .guide-btn-extra { display: none; }  /* shorten to "ⓘ User Guide" on small screens */
   .id-date-row { grid-template-columns: 1fr 1fr; }
   .bottom-controls { flex-direction: row; flex-wrap: nowrap; }
   #search-input    { flex: 1; min-width: 0; }
   #clear-search    { flex-shrink: 0; width: auto; }
   .main-table-container { height: 260px; }
 
-  /* ── Toolbar: keep all three controls on one line ── */
+  /* ── Toolbar: keep controls on one line ── */
   .text-toolbar { gap: 6px; }
 
   #clear-all-btn {
@@ -557,9 +564,8 @@ a.external-link:hover { text-decoration: underline; }
   .city-btn  { padding: 0 7px; font-size: 11px; }
 
   #user-guide-tips-btn {
-    padding: 5px 8px;
+    padding: 5px 10px;
     font-size: 11px;
-    flex-shrink: 0;
   }
 }
 
