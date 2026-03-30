@@ -18,21 +18,27 @@ let activeIndex       = -1;   // keyboard nav position in autocomplete
 let lastTextRows      = null; // name rows for the currently selected text
 let lastSelectedNames = null; // highlighted row in the names table
 let lastSelectedTexts = null; // highlighted row in the texts table
-let cityFilter        = "all";
-let chapterFilter     = "all"; // "all" | "4" | "5" | "6" | "0" (unassigned)
+let activeFilter      = { type: "all", value: "all" }; // replaces cityFilter + chapterFilter
 let contextLabel      = { html: "All Texts" };
 let activePerson      = null; // { pid, pn } — set when name-row filter is active
 
+// Convenience getters so internal logic stays readable
+function cityFilter()    { return activeFilter.type === "city"    ? activeFilter.value : "all"; }
+function chapterFilter() { return activeFilter.type === "chapter" ? activeFilter.value : "all"; }
+
 const G = s => `<span class="label-dynamic">${escapeHtml(s)}</span>`;
 
-// Build full label HTML: context + city suffix + chapter suffix (all highlighted)
+// Build full label HTML: context + active filter suffix (highlighted)
 function compositeLabel() {
-  const citySuffix = cityFilter === "nippur" ? ` from ${G("Nippur")}`
-                   : cityFilter === "ur"     ? ` from ${G("Ur")}`
-                   : "";
-  const chapLabel  = chapterFilter === "0" ? "–" : chapterFilter;
-  const chapSuffix = chapterFilter !== "all" ? ` · Ch.${G(chapLabel)}` : "";
-  return contextLabel.html + citySuffix + chapSuffix;
+  if (activeFilter.type === "city") {
+    const label = activeFilter.value === "nippur" ? "Nippur" : "Ur";
+    return contextLabel.html + ` from ${G(label)}`;
+  }
+  if (activeFilter.type === "chapter") {
+    const label = activeFilter.value === "0" ? "–" : activeFilter.value;
+    return contextLabel.html + ` in Chapter ${G(label)}`;
+  }
+  return contextLabel.html;
 }
 
 // ── Helpers ───────────────────────────────────────────────
@@ -288,11 +294,40 @@ function displayRecord(record, tabulatorRow) {
 
 // Returns true if a names row's T_TID matches the current city filter
 function nameMatchesCity(r) {
-  if (cityFilter === "all") return true;
+  const cf = cityFilter();
+  if (cf === "all") return true;
   const tid = str(r.T_TID).toUpperCase();
-  if (cityFilter === "nippur") return tid.startsWith("NIPPUR");
-  if (cityFilter === "ur")     return tid.startsWith("UR");
+  if (cf === "nippur") return tid.startsWith("NIPPUR");
+  if (cf === "ur")     return tid.startsWith("UR");
   return true;
+}
+
+// Build a standard names-filter warning element
+function buildFilterWarning(messageHtml, btnLabel, onReset) {
+  const warning = document.createElement("div");
+  warning.className = "names-filter-warning";
+  warning.innerHTML = `
+    <div class="names-filter-warning-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 2L14 13H2L8 2Z" stroke="#c9a84c" stroke-width="1.5" stroke-linejoin="round"/>
+        <line x1="8" y1="6" x2="8" y2="9.5" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="8" cy="11.5" r="0.75" fill="#c9a84c"/>
+      </svg>
+    </div>
+    <div class="names-filter-warning-text">${messageHtml}</div>
+    <button class="names-filter-warning-btn">${btnLabel}</button>`;
+  warning.querySelector(".names-filter-warning-btn").addEventListener("click", onReset);
+  return warning;
+}
+
+// Reset the sort toggle to "All" and reapply
+function resetSortFilter() {
+  activeFilter = { type: "all", value: "all" };
+  document.querySelectorAll(".sort-btn").forEach(b =>
+    b.classList.toggle("sort-btn-active", b.dataset.filterType === "all")
+  );
+  applyTextFilter();
+  setTimeout(updateTableHeader, 30);
 }
 
 function loadNamesForText(textID) {
@@ -309,99 +344,58 @@ function loadNamesForText(textID) {
   );
   lastTextRows = rows;
 
-  // ── City mismatch warning ──────────────────────────────
-  if (rows.length === 0 && cityFilter !== "all") {
+  // ── Filter mismatch warning ────────────────────────────
+  if (activeFilter.type !== "all") {
     const hiddenRows = allNamesData.filter(r => str(r.T_TID) === str(textID));
-    if (hiddenRows.length > 0) {
+
+    if (activeFilter.type === "city" && rows.length === 0 && hiddenRows.length > 0) {
+      const cityLabel = activeFilter.value === "nippur" ? "Nippur" : "Ur";
+      const tid       = str(textID).toUpperCase();
+      const textCity  = tid.startsWith("NIPPUR") ? "Nippur" : "Ur";
+      const count     = hiddenRows.length;
+      const noun      = count === 1 ? "name" : "names";
+
       namesTable.setData([]).then(() => {
-        const cityLabel = cityFilter.charAt(0).toUpperCase() + cityFilter.slice(1);
-        const tid       = str(textID).toUpperCase();
-        const textCity  = tid.startsWith("NIPPUR") ? "Nippur" : "Ur";
-        const count     = hiddenRows.length;
-        const noun      = count === 1 ? "name" : "names";
-
-        const warning = document.createElement("div");
-        warning.className = "names-filter-warning";
-        warning.innerHTML = `
-          <div class="names-filter-warning-icon">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 2L14 13H2L8 2Z" stroke="#c9a84c" stroke-width="1.5" stroke-linejoin="round"/>
-              <line x1="8" y1="6" x2="8" y2="9.5" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/>
-              <circle cx="8" cy="11.5" r="0.75" fill="#c9a84c"/>
-            </svg>
-          </div>
-          <div class="names-filter-warning-text">
-            <strong>${count} ${noun}</strong> exist for this text but are hidden<br>
-            because the <strong>${cityLabel}</strong> filter is active for a <strong>${textCity}</strong> text.
-          </div>
-          <button class="names-filter-warning-btn">&#8635; Show all cities</button>`;
-
-        warning.querySelector(".names-filter-warning-btn").addEventListener("click", () => {
-          cityFilter = "all";
-          document.querySelectorAll(".city-btn").forEach(b =>
-            b.classList.toggle("city-btn-active", b.dataset.city === "all")
-          );
-          setTimeout(updateTableHeader, 30);
-          warning.remove();
-          loadNamesForText(textID);
-        });
-
+        const warning = buildFilterWarning(
+          `<strong>${count} ${noun}</strong> exist for this text but are hidden<br>
+           because the <strong>${cityLabel}</strong> filter is active for a <strong>${textCity}</strong> text.`,
+          "&#8635; Show all",
+          () => { resetSortFilter(); warning.remove(); loadNamesForText(textID); }
+        );
         namesPanel.appendChild(warning);
         clampNamesPanelHeight();
       });
       return;
     }
-  }
 
-  // ── Chapter mismatch warning ───────────────────────────
-  if (chapterFilter !== "all" && mainTableRef) {
-    const textRecord = allTextsData.find(r => str(r.TextID_D) === str(textID));
-    if (textRecord) {
-      const chapVal    = str(textRecord.Chap);
-      const isUnassigned = chapVal === "" || chapVal === "0" || chapVal === "-";
-      const textChaps  = isUnassigned ? ["0"] : chapVal.split(";").map(c => c.trim());
-      const matchesChap = chapterFilter === "0"
-        ? isUnassigned
-        : textChaps.includes(chapterFilter);
+    if (activeFilter.type === "chapter") {
+      const textRecord = allTextsData.find(r => str(r.TextID_D) === str(textID));
+      if (textRecord) {
+        const chapVal      = str(textRecord.Chap);
+        const isUnassigned = chapVal === "" || chapVal === "0" || chapVal === "-";
+        const textChaps    = isUnassigned ? ["0"] : chapVal.split(";").map(c => c.trim());
+        const matchesChap  = activeFilter.value === "0"
+          ? isUnassigned
+          : textChaps.includes(activeFilter.value);
 
-      if (!matchesChap) {
-        const chapDisplay = chapterFilter === "0" ? "–" : chapterFilter;
-        const textChapDisplay = textChaps.map(c => c === "0" ? "–" : `Ch.${c}`).join(", ");
-        const allRows = allNamesData.filter(r => str(r.T_TID) === str(textID));
-        const count = allRows.length;
-        const noun  = count === 1 ? "name" : "names";
+        if (!matchesChap) {
+          const chapDisplay     = activeFilter.value === "0" ? "–" : activeFilter.value;
+          const textChapDisplay = textChaps.map(c => c === "0" ? "–" : `Ch.${c}`).join(", ");
+          const count = hiddenRows.length;
+          const noun  = count === 1 ? "name" : "names";
 
-        namesTable.setData([]).then(() => {
-          const warning = document.createElement("div");
-          warning.className = "names-filter-warning";
-          warning.innerHTML = `
-            <div class="names-filter-warning-icon">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8 2L14 13H2L8 2Z" stroke="#c9a84c" stroke-width="1.5" stroke-linejoin="round"/>
-                <line x1="8" y1="6" x2="8" y2="9.5" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/>
-                <circle cx="8" cy="11.5" r="0.75" fill="#c9a84c"/>
-              </svg>
-            </div>
-            <div class="names-filter-warning-text">
-              <strong>${count} ${noun}</strong> exist for this text but are hidden<br>
-              because the <strong>Ch.${chapDisplay}</strong> filter is active for a <strong>${textChapDisplay}</strong> text.
-            </div>
-            <button class="names-filter-warning-btn">&#8635; Show all chapters</button>`;
-
-          warning.querySelector(".names-filter-warning-btn").addEventListener("click", () => {
-            chapterFilter = "all";
-            document.querySelectorAll(".chap-btn").forEach(b =>
-              b.classList.toggle("city-btn-active", b.dataset.chap === "all")
+          namesTable.setData([]).then(() => {
+            const warning = buildFilterWarning(
+              `<strong>${count} ${noun}</strong> exist for this text but are hidden<br>
+               because the <strong>Ch.${chapDisplay}</strong> filter is active for a <strong>${textChapDisplay}</strong> text.`,
+              "&#8635; Show all",
+              () => { resetSortFilter(); warning.remove(); loadNamesForText(textID); }
             );
-            setTimeout(updateTableHeader, 30);
-            warning.remove();
-            loadNamesForText(textID);
+            namesPanel.appendChild(warning);
+            clampNamesPanelHeight();
           });
-
-          namesPanel.appendChild(warning);
-          clampNamesPanelHeight();
-        });
-        return;
+          return;
+        }
       }
     }
   }
@@ -548,13 +542,9 @@ function clearAll() {
 
   contextLabel = { html: "All Texts" };
   activePerson = null;
-  cityFilter   = "all";
-  chapterFilter = "all";
-  document.querySelectorAll(".city-btn").forEach(b =>
-    b.classList.toggle("city-btn-active", b.dataset.city === "all")
-  );
-  document.querySelectorAll(".chap-btn").forEach(b =>
-    b.classList.toggle("city-btn-active", b.dataset.chap === "all")
+  activeFilter = { type: "all", value: "all" };
+  document.querySelectorAll(".sort-btn").forEach(b =>
+    b.classList.toggle("sort-btn-active", b.dataset.filterType === "all")
   );
   if (mainTableRef) mainTableRef.clearFilter();
   updateTableHeader();
@@ -776,24 +766,12 @@ fetchCSV(TEXTS_URL)
       "gen":  "Genre_D"
     };
 
-    // ── City toggle ────────────────────────────────────────
-    document.querySelectorAll(".city-btn").forEach(btn => {
+    // ── Sort toggle (merged city + chapter) ────────────────
+    document.querySelectorAll(".sort-btn").forEach(btn => {
       btn.addEventListener("click", () => {
-        cityFilter = btn.dataset.city;
-        document.querySelectorAll(".city-btn").forEach(b =>
-          b.classList.toggle("city-btn-active", b === btn)
-        );
-        applyTextFilter();
-        setTimeout(updateTableHeader, 30);
-      });
-    });
-
-    // ── Chapter toggle ─────────────────────────────────────
-    document.querySelectorAll(".chap-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        chapterFilter = btn.dataset.chap;
-        document.querySelectorAll(".chap-btn").forEach(b =>
-          b.classList.toggle("city-btn-active", b === btn)
+        activeFilter = { type: btn.dataset.filterType, value: btn.dataset.filterValue };
+        document.querySelectorAll(".sort-btn").forEach(b =>
+          b.classList.toggle("sort-btn-active", b === btn)
         );
         applyTextFilter();
         setTimeout(updateTableHeader, 30);
@@ -833,25 +811,27 @@ fetchCSV(TEXTS_URL)
       }
       document.getElementById("main-table-label").innerHTML = compositeLabel();
 
-      const hasCityFilter    = cityFilter    !== "all";
-      const hasChapterFilter = chapterFilter !== "all";
-      const hasAnyFilter     = pairs.length > 0 || freeText || hasCityFilter || hasChapterFilter;
+      const hasAnyFilter = pairs.length > 0 || freeText || activeFilter.type !== "all";
 
       if (!hasAnyFilter) {
         mainTableRef.clearFilter();
       } else {
         mainTableRef.setFilter(row => {
-          const id = str(row.TextID_D).toUpperCase();
-          if (cityFilter === "nippur" && !id.startsWith("NIPPUR")) return false;
-          if (cityFilter === "ur"     && !id.startsWith("UR"))     return false;
+          // City filter
+          if (activeFilter.type === "city") {
+            const id = str(row.TextID_D).toUpperCase();
+            if (activeFilter.value === "nippur" && !id.startsWith("NIPPUR")) return false;
+            if (activeFilter.value === "ur"     && !id.startsWith("UR"))     return false;
+          }
 
-          // Chapter filter: split on ";" to handle multi-chapter values like "4;6"
-          if (hasChapterFilter) {
-            const chapVal = str(row.Chap);
-            const chapValue = chapterFilter === "0"
-              ? (chapVal === "" || chapVal === "0" || chapVal === "-")
-              : chapVal.split(";").map(c => c.trim()).includes(chapterFilter);
-            if (!chapValue) return false;
+          // Chapter filter
+          if (activeFilter.type === "chapter") {
+            const chapVal      = str(row.Chap);
+            const isUnassigned = chapVal === "" || chapVal === "0" || chapVal === "-";
+            const passes = activeFilter.value === "0"
+              ? isUnassigned
+              : chapVal.split(";").map(c => c.trim()).includes(activeFilter.value);
+            if (!passes) return false;
           }
 
           for (const { field, term } of pairs) {
